@@ -1,8 +1,12 @@
-﻿namespace KerbalAnalysis.Nodes
+﻿using KerbalAnalysis.Nodes.Abstract;
+using System.Collections.Generic;
+
+namespace KerbalAnalysis.Nodes
 {
     public class GlobalStatementNode : KNode
     {
         public StatementNode Statement { get; set; }
+        public override List<INodeOrToken> Children => new List<INodeOrToken> { Statement };
 
         public GlobalStatementNode()
         {

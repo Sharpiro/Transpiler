@@ -11,13 +11,10 @@ namespace ConsoleApp2
 {
     internal class Program
     {
-        //private static List<string> _statements = new List<string>();
         private static List<GlobalStatementNode> _statements = new List<GlobalStatementNode>();
 
         private static void Main(string[] args)
         {
-            //SyntaxToken
-            //SyntaxKind
             var source =
 @"log(""first"")";
             try
@@ -25,15 +22,15 @@ namespace ConsoleApp2
                 var kGlobalStatement = KSyntaxFactory.GlobalStatement();
                 var script = CSharpScript.Create(source);
                 var root = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-                //var nodes = root.DescendantNodes();
-                var nodes = root.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-                ParseGlobalStatements(nodes);
+                var globalStatements = root.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+                ParseGlobalStatements(globalStatements);
+                var nodes = globalStatements.First().DescendantNodes().ToList();
+                var kNodes = _statements.FirstOrDefault().DescendantNodes().ToList();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex); //temp
             }
-            //var finalText = string.Join(Environment.NewLine, _statements);
         }
 
         private static void ParseGlobalStatements(List<GlobalStatementSyntax> globalStatements)
@@ -69,20 +66,6 @@ namespace ConsoleApp2
             var kExpressionStatement = KSyntaxFactory.ExpressionStatement();
             newKGlobalStatement.WithStatement(kExpressionStatement);
             ParseExpression(expressionStatement.Expression, kExpressionStatement);
-            //var identifierNode = expressionStatement.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
-            //var statementName = identifierNode.Identifier.Text;
-            //newKGlobalStatement.WithStatement(new ExpressionStatementNode());
-            //switch (statementName)
-            //{
-            //    case "log":
-            //        ParseLogStatement(expressionStatement);
-            //        break;
-            //    //case "clear":
-            //    //    ParseClearStatement(expressionStatement);
-            //    //    break;
-            //    default:
-            //        throw new KeyNotFoundException($"couldn't find statement with name '{statementName}'");
-            //}
         }
 
         private static void ParseExpression(ExpressionSyntax expression, KNode parent)
@@ -95,8 +78,11 @@ namespace ConsoleApp2
                 case SyntaxKind.StringLiteralExpression:
                     ParseLiteralExpression(expression as LiteralExpressionSyntax, parent as ArgumentNode);
                     break;
-                default:
+                case SyntaxKind.IdentifierName:
+                    ParseIdentifierNameExpression(expression as IdentifierNameSyntax, parent as InvocationExpressionNode);
                     break;
+                default:
+                    throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind()}'");
             }
         }
 
@@ -111,12 +97,7 @@ namespace ConsoleApp2
         {
             var invocationExpression = KSyntaxFactory.InvocationExpression();
             kExpressionStatement.WithExpression(invocationExpression);
-            switch (expression.Expression.Kind())
-            {
-                case SyntaxKind.IdentifierName:
-                    ParseIdentifierNameExpression(expression.Expression as IdentifierNameSyntax, invocationExpression);
-                    break;
-            }
+            ParseExpression(expression.Expression, invocationExpression);
             ParseArgumentList(expression.ArgumentList, invocationExpression);
         }
 
@@ -124,7 +105,7 @@ namespace ConsoleApp2
         {
             var name = identifierNameSyntax.Identifier.Text;
             var kIdentifierExpression = KSyntaxFactory.IdentifierNameExpression(KSyntaxFactory.Identifier(name));
-            invocationExpression.Expression = kIdentifierExpression;
+            invocationExpression.WithExpression(kIdentifierExpression);
         }
 
         private static void ParseArgumentList(ArgumentListSyntax argumentList, InvocationExpressionNode invocationExpression)
@@ -142,20 +123,7 @@ namespace ConsoleApp2
         {
             var kArgument = KSyntaxFactory.Argument();
             ParseExpression(argument.Expression, kArgument);
+            argumentList.AddArgument(kArgument);
         }
-
-        //private static void ParseLogStatement(ExpressionStatementSyntax statement)
-        //{
-        //    //var arg = statement.DescendantNodes().OfType<LiteralExpressionSyntax>().Single().GetText().ToString();
-        //    //var logStatement = $"PRINT {arg}.";
-        //    //_statements.Add(logStatement);
-        //}
-
-        //private static void ParseClearStatement(ExpressionStatementSyntax statement)
-        //{
-        //    //var arg = statement.DescendantNodes().OfType<LiteralExpressionSyntax>().Single().GetText().ToString();
-        //    //var logStatement = "CLEARSCREEN.";
-        //    //_statements.Add(logStatement);
-        //}
     }
 }

@@ -58,7 +58,8 @@ namespace KerbalAnalysis
         {
             return new SyntaxToken
             {
-                Text = name
+                Text = name,
+                Kind = KSyntaxKind.IdentifierToken
             };
         }
 
@@ -82,7 +83,8 @@ namespace KerbalAnalysis
         {
             return new SyntaxToken
             {
-                Text = stringLiteral
+                Text = stringLiteral,
+                Kind = KSyntaxKind.StringLiteralToken
             };
         }
     }

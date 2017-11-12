@@ -1,13 +1,12 @@
-﻿namespace KerbalAnalysis.Nodes
+﻿using KerbalAnalysis.Nodes.Abstract;
+using System.Collections.Generic;
+
+namespace KerbalAnalysis.Nodes
 {
     public class IdentifierNameExpressionNode : ExpressionNode
     {
         public SyntaxToken Identifier { get; set; }
-
-        //public IdentifierNameExpressionNode()
-        //{
-        //    Kind = SyntaxKind.IdentifierNameExpression;
-        //}
+        public override List<INodeOrToken> Children => new List<INodeOrToken> { Identifier };
 
         public IdentifierNameExpressionNode(SyntaxToken identifier)
         {

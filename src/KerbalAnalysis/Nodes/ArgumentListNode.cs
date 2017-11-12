@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
+using KerbalAnalysis.Nodes.Abstract;
+using System.Linq;
 
 namespace KerbalAnalysis.Nodes
 {
     public class ArgumentListNode : KNode
     {
         public List<ArgumentNode> Arguments { get; set; } = new List<ArgumentNode>();
+        public override List<INodeOrToken> Children => Arguments.Cast<INodeOrToken>().ToList();
+
         //public SyntaxToken OpenParenToken { get; set; }
         //public SyntaxToken CloseParenToken { get; set; }
 
@@ -13,9 +17,11 @@ namespace KerbalAnalysis.Nodes
             Kind = KSyntaxKind.ArgumentList;
         }
 
-        public void AddArgument(ArgumentNode argument)
+        public ArgumentListNode AddArgument(ArgumentNode argument)
         {
+            argument.Parent = this;
             Arguments.Add(argument);
+            return this;
         }
     }
 }

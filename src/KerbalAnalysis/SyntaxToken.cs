@@ -3,7 +3,7 @@ using KerbalAnalysis.Nodes.Abstract;
 
 namespace KerbalAnalysis
 {
-    public class SyntaxToken : IParent
+    public class SyntaxToken : INodeOrToken
     {
         public KSyntaxKind Kind { get; set; }
         public string Text { get; set; }

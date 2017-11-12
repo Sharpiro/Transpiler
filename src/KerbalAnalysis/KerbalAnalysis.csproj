@@ -43,7 +43,7 @@
     <Compile Include="KSyntaxFactory.cs" />
     <Compile Include="KSyntaxKind.cs" />
     <Compile Include="Nodes\Abstract\ExpressionNode.cs" />
-    <Compile Include="Nodes\Abstract\IParent.cs" />
+    <Compile Include="Nodes\Abstract\INodeOrToken.cs" />
     <Compile Include="Nodes\ArgumentListNode.cs" />
     <Compile Include="Nodes\ArgumentNode.cs" />
     <Compile Include="Nodes\ExpressionStatementNode.cs" />

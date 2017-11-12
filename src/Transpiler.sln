@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbalAnalysis", "KerbalAna
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runner", "Runner\Runner.csproj", "{C49958A4-C330-4C2D-8F15-1F32B27A96B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbalAnalysis.Tests", "KerbalAnalysis.Tests\KerbalAnalysis.Tests.csproj", "{891C471B-F3F5-4C97-B268-3BABF0582159}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B34949B3-620A-447C-91D6-B0D8CFCFF1B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4EC56BFE-EEA7-40E3-953D-90F57701E926}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +27,18 @@ Global
 		{C49958A4-C330-4C2D-8F15-1F32B27A96B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C49958A4-C330-4C2D-8F15-1F32B27A96B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C49958A4-C330-4C2D-8F15-1F32B27A96B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{891C471B-F3F5-4C97-B268-3BABF0582159}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{891C471B-F3F5-4C97-B268-3BABF0582159}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{891C471B-F3F5-4C97-B268-3BABF0582159}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{891C471B-F3F5-4C97-B268-3BABF0582159}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EF32AEE3-15AD-45C1-9766-A899E25F9B2E} = {B34949B3-620A-447C-91D6-B0D8CFCFF1B2}
+		{C49958A4-C330-4C2D-8F15-1F32B27A96B4} = {B34949B3-620A-447C-91D6-B0D8CFCFF1B2}
+		{891C471B-F3F5-4C97-B268-3BABF0582159} = {4EC56BFE-EEA7-40E3-953D-90F57701E926}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {354F404A-523F-461F-8060-1F78740C7DF3}

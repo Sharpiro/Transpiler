@@ -1,7 +1,8 @@
 ﻿namespace KerbalAnalysis.Nodes.Abstract
 {
-    interface IParent
+    public interface INodeOrToken
     {
         KNode Parent { get; set; }
+        KSyntaxKind Kind { get; set; }
     }
 }
