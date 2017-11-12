@@ -8,6 +8,7 @@
         IdentifierNameExpression = 8616,
         IdentifierToken = 8508,
         Argument = 8638,
+        NumericLiteralExpression = 8749,
         StringLiteralExpression = 8750,
         StringLiteralToken = 8511,
         GlobalStatement = 8841,
@@ -16,5 +17,7 @@
         OpenParenToken = 8200,
         CloseParenToken = 8201,
         SimpleAssignmentExpression = 8714,
+        SetKeyword = 8843,
+        ToKeyword = 8844,
     }
 }

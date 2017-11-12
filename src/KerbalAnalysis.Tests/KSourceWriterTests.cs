@@ -45,5 +45,22 @@ print("" == HELLO WORLD == "").";
 
             Assert.AreEqual(expectedOutput, kSource);
         }
+
+        [TestMethod]
+        public void AssignmentExpressionTest()
+        {
+            var source =
+@"throttle = 1.0";
+            var expectedOutput =
+@"set throttle to 1.0.";
+            var script = CSharpScript.Create(source);
+            var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
+            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
+
+            var kSource = _kSourceWriter.GetSourceCode(kCompilation);
+
+            Assert.AreEqual(expectedOutput, kSource);
+        }
     }
 }

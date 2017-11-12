@@ -47,15 +47,28 @@ namespace KerbalAnalysis
                 case KSyntaxKind.InvocationExpression:
                     WriteInvocationExpression(expression as InvocationExpressionNode);
                     break;
+                case KSyntaxKind.NumericLiteralExpression:
                 case KSyntaxKind.StringLiteralExpression:
                     WriteLiteralExpression(expression as LiteralExpressionNode);
                     break;
                 case KSyntaxKind.IdentifierNameExpression:
                     WriteIdentifierNameExpression(expression as IdentifierNameExpressionNode);
                     break;
+                case KSyntaxKind.SimpleAssignmentExpression:
+                    WriteSimpleAssignmentExpression(expression as AssignmentExpressionNode);
+                    break;
                 default:
                     throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind}'");
             }
+        }
+
+        private void WriteSimpleAssignmentExpression(AssignmentExpressionNode assignmentExpression)
+        {
+            _builder.Append($"{assignmentExpression.Set} ");
+            WriteExpression(assignmentExpression.Left);
+            _builder.Append(" ");
+            _builder.Append($"{assignmentExpression.To} ");
+            WriteExpression(assignmentExpression.Right);
         }
 
         private void WriteLiteralExpression(LiteralExpressionNode literalExpression)

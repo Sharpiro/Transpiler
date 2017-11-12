@@ -17,11 +17,14 @@ namespace KerbalAnalysis.Nodes
             Kind = KSyntaxKind.ArgumentList;
         }
 
-        public ArgumentListNode AddArgument(ArgumentNode argument)
+        public ArgumentListNode AddArguments(params ArgumentNode[] arguments)
         {
-            argument.Parent = this;
-            Arguments = Arguments.Add(argument);
-            Count++;
+            foreach (var argument in arguments)
+            {
+                argument.Parent = this;
+                Arguments = Arguments.Add(argument);
+                Count++;
+            }
             return this;
         }
 

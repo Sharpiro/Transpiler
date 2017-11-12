@@ -30,23 +30,23 @@ namespace KerbalAnalysis.Tests
             }
         }
 
-//        [TestMethod]
-//        public void AssignmentExpressionTest()
-//        {
-//            var source =
-//@"throttle = 1";
-//            var script = CSharpScript.Create(source);
-//            var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-//            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-//            var nodes = compilation.DescendantNodes().ToList();
-//            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
-//            var kNodes = kCompilation.DescendantNodes().ToList();
-//            Assert.AreEqual(nodes.Count, kNodes.Count);
+        [TestMethod]
+        public void AssignmentExpressionTest()
+        {
+            var source =
+@"throttle = 1";
+            var script = CSharpScript.Create(source);
+            var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
+            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+            var nodes = compilation.DescendantNodes().ToList();
+            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
+            var kNodes = kCompilation.DescendantNodes().ToList();
+            Assert.AreEqual(nodes.Count, kNodes.Count);
 
-//            for (var i = 0; i < nodes.Count; i++)
-//            {
-//                Assert.AreEqual((int)nodes[i].Kind(), (int)kNodes[i].Kind);
-//            }
-//        }
+            for (var i = 0; i < nodes.Count; i++)
+            {
+                Assert.AreEqual((int)nodes[i].Kind(), (int)kNodes[i].Kind);
+            }
+        }
     }
 }

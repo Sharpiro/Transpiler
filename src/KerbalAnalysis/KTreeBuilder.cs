@@ -21,17 +21,19 @@ namespace KerbalAnalysis
             foreach (var globalStatement in globalStatements)
             {
                 var kGlobalStatement = new GlobalStatementNode();
+                ExpressionStatementNode expressionStatement;
                 switch (globalStatement.Statement.Kind())
                 {
                     //case SyntaxKind.ForStatement:
                     //    ParseForStatement(globalStatement.Statement as ForStatementSyntax, kGlobalStatement);
                     //    break;
                     case SyntaxKind.ExpressionStatement:
-                        ParseExpressionStatement(globalStatement.Statement as ExpressionStatementSyntax, kGlobalStatement);
+                        expressionStatement = ParseExpressionStatement(globalStatement.Statement as ExpressionStatementSyntax);
                         break;
                     default:
                         throw new KeyNotFoundException($"couldn't find statement with name '{globalStatement.Kind()}'");
                 }
+                kGlobalStatement.WithStatement(expressionStatement);
                 yield return kGlobalStatement;
             }
         }
@@ -44,89 +46,92 @@ namespace KerbalAnalysis
         //    var statement = $"FROM {{local {localVarName} is {initValue}.}} {conditionalExpression} STEP {{SET {localVarName} to {localVarName} - 1.}} DO";
         //}
 
-        private void ParseExpressionStatement(ExpressionStatementSyntax expressionStatement, GlobalStatementNode newKGlobalStatement)
+        private ExpressionStatementNode ParseExpressionStatement(ExpressionStatementSyntax expressionStatement)
         {
-            var kExpressionStatement = KSyntaxFactory.ExpressionStatement();
-            newKGlobalStatement.WithStatement(kExpressionStatement);
-            ParseExpression(expressionStatement.Expression, kExpressionStatement);
+            var expression = ParseExpression(expressionStatement.Expression);
+            var kExpressionStatement = KSyntaxFactory.ExpressionStatement().WithExpression(expression);
+            return kExpressionStatement;
         }
 
-        private void ParseExpression(ExpressionSyntax expression, KNode parent)
+        private ExpressionNode ParseExpression(ExpressionSyntax expression)
         {
+            ExpressionNode kExpression;
             switch (expression.Kind())
             {
                 case SyntaxKind.InvocationExpression:
-                    ParseInvocationExpression(expression as InvocationExpressionSyntax, parent as ExpressionStatementNode);
+                    kExpression = ParseInvocationExpression(expression as InvocationExpressionSyntax);
                     break;
                 case SyntaxKind.NumericLiteralExpression:
                 case SyntaxKind.StringLiteralExpression:
-                    ParseLiteralExpression(expression as LiteralExpressionSyntax, parent as ArgumentNode);
+                    kExpression = ParseLiteralExpression(expression as LiteralExpressionSyntax);
                     break;
                 case SyntaxKind.IdentifierName:
-                    ParseIdentifierNameExpression(expression as IdentifierNameSyntax, parent as InvocationExpressionNode);
+                    kExpression = ParseIdentifierNameExpression(expression as IdentifierNameSyntax);
                     break;
                 case SyntaxKind.SimpleAssignmentExpression:
-                    ParseSimpleAssignmentExpression(expression as AssignmentExpressionSyntax, parent as ExpressionStatementNode);
+                    kExpression = ParseSimpleAssignmentExpression(expression as AssignmentExpressionSyntax);
                     break;
                 default:
                     throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind()}'");
             }
+            return kExpression;
         }
 
-        private void ParseSimpleAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, ExpressionStatementNode kExpressionStatement)
+        private AssignmentExpressionNode ParseSimpleAssignmentExpression(AssignmentExpressionSyntax assignmentExpression)
         {
-            ExpressionNode left = null;
-            ExpressionNode right = null;
-            var kAssignmentExpression = KSyntaxFactory.AssignmentExpression(KSyntaxKind.SimpleAssignmentExpression);
-            kExpressionStatement.WithExpression(kAssignmentExpression);
-            ParseExpression(assignmentExpression.Left, kAssignmentExpression);
-            ParseExpression(assignmentExpression.Right, kAssignmentExpression);
-
+            var set = KSyntaxFactory.Token(KSyntaxKind.SetKeyword);
+            var leftExpression = ParseExpression(assignmentExpression.Left);
+            var to = KSyntaxFactory.Token(KSyntaxKind.ToKeyword);
+            var rightExpression = ParseExpression(assignmentExpression.Right);
+            var kAssignmentExpression = KSyntaxFactory.AssignmentExpression(KSyntaxKind.SimpleAssignmentExpression)
+                .WithSet(set).WithLeft(leftExpression).WithTo(to).WithRight(rightExpression);
+            return kAssignmentExpression;
         }
 
-        private void ParseLiteralExpression(LiteralExpressionSyntax literalExpression, ArgumentNode kExpressionStatement)
+        private LiteralExpressionNode ParseLiteralExpression(LiteralExpressionSyntax literalExpression)
         {
             var stringLiteral = literalExpression.Token.Text;
             var kLiteralExpression = KSyntaxFactory.LiteralExpression((KSyntaxKind)literalExpression.Kind(), KSyntaxFactory.Literal(stringLiteral));
-            kExpressionStatement.WithExpression(kLiteralExpression);
+            return kLiteralExpression;
         }
 
-        private void ParseInvocationExpression(InvocationExpressionSyntax expression, ExpressionStatementNode kExpressionStatement)
+        private InvocationExpressionNode ParseInvocationExpression(InvocationExpressionSyntax invocationExpressionSyntax)
         {
-            var invocationExpression = KSyntaxFactory.InvocationExpression();
-            kExpressionStatement.WithExpression(invocationExpression);
-            ParseExpression(expression.Expression, invocationExpression);
-            ParseArgumentList(expression.ArgumentList, invocationExpression);
+            var expression = ParseExpression(invocationExpressionSyntax.Expression);
+            var argumentList = ParseArgumentList(invocationExpressionSyntax.ArgumentList);
+            var invocationExpression = KSyntaxFactory.InvocationExpression().WithExpression(expression).WithArgumentList(argumentList);
+            return invocationExpression;
         }
 
-        private void ParseIdentifierNameExpression(IdentifierNameSyntax identifierNameSyntax, InvocationExpressionNode invocationExpression)
+        private IdentifierNameExpressionNode ParseIdentifierNameExpression(IdentifierNameSyntax identifierNameSyntax)
         {
             var name = identifierNameSyntax.Identifier.Text;
             var kIdentifierExpression = KSyntaxFactory.IdentifierNameExpression(KSyntaxFactory.Identifier(name));
-            invocationExpression.WithExpression(kIdentifierExpression);
+            return kIdentifierExpression;
         }
 
-        private void ParseArgumentList(ArgumentListSyntax argumentList, InvocationExpressionNode invocationExpression)
+        private ArgumentListNode ParseArgumentList(ArgumentListSyntax argumentList)
         {
             var kArgumentList = KSyntaxFactory.ArgumentList();
-            invocationExpression.WithArgumentList(kArgumentList);
             var sourceOpenParenSpan = argumentList.OpenParenToken.Span;
             var sourceCloseParenSpan = argumentList.CloseParenToken.Span;
             kArgumentList.WithOpenParenToken(KSyntaxFactory.Token(KSyntaxKind.OpenParenToken, sourceOpenParenSpan.Start, sourceOpenParenSpan.End));
 
             foreach (var argument in argumentList.Arguments)
             {
-                ParseArgument(argument, invocationExpression.ArgumentList);
+                var kArgument = ParseArgument(argument);
+                kArgumentList.AddArguments(kArgument);
             }
 
             kArgumentList.WithCloseParenToken(KSyntaxFactory.Token(KSyntaxKind.CloseParenToken, sourceCloseParenSpan.Start, sourceCloseParenSpan.End));
+            return kArgumentList;
         }
 
-        private void ParseArgument(ArgumentSyntax argument, ArgumentListNode argumentList)
+        private ArgumentNode ParseArgument(ArgumentSyntax argument)
         {
-            var kArgument = KSyntaxFactory.Argument();
-            ParseExpression(argument.Expression, kArgument);
-            argumentList.AddArgument(kArgument);
+            var expression = ParseExpression(argument.Expression);
+            var kArgument = KSyntaxFactory.Argument().WithExpression(expression);
+            return kArgument;
         }
     }
 }

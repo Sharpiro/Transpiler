@@ -27,6 +27,12 @@ namespace KerbalAnalysis
                 case KSyntaxKind.Period:
                     text = ".";
                     break;
+                case KSyntaxKind.SetKeyword:
+                    text = "set";
+                    break;
+                case KSyntaxKind.ToKeyword:
+                    text = "to";
+                    break;
                 default:
                     throw new KeyNotFoundException($"Unable to find token text value for '{openParenToken}'");
             }
@@ -69,8 +75,7 @@ namespace KerbalAnalysis
 
         public static LiteralExpressionNode LiteralExpression(KSyntaxKind stringLiteralExpression, KSyntaxToken token)
         {
-            return new LiteralExpressionNode(KSyntaxKind.StringLiteralExpression, token);
-
+            return new LiteralExpressionNode(stringLiteralExpression, token);
         }
 
         public static KSyntaxToken Literal(string stringLiteral)
