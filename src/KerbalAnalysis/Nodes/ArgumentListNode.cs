@@ -9,9 +9,6 @@ namespace KerbalAnalysis.Nodes
         public List<ArgumentNode> Arguments { get; set; } = new List<ArgumentNode>();
         public override List<INodeOrToken> Children => Arguments.Cast<INodeOrToken>().ToList();
 
-        //public SyntaxToken OpenParenToken { get; set; }
-        //public SyntaxToken CloseParenToken { get; set; }
-
         public ArgumentListNode()
         {
             Kind = KSyntaxKind.ArgumentList;

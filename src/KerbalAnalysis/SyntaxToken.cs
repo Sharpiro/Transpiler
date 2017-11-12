@@ -3,12 +3,14 @@ using KerbalAnalysis.Nodes.Abstract;
 
 namespace KerbalAnalysis
 {
-    public class SyntaxToken : INodeOrToken
+    public class KSyntaxToken : INodeOrToken
     {
         public KSyntaxKind Kind { get; set; }
         public string Text { get; set; }
         public int StartIndex { get; set; }
         public int EndIndex { get; set; }
         public KNode Parent { get; set; }
+
+        public override string ToString() => Text;
     }
 }

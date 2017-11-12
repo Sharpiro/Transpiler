@@ -6,7 +6,9 @@ namespace KerbalAnalysis.Nodes
     public class ExpressionStatementNode : StatementNode
     {
         public ExpressionNode Expression { get; set; }
-        public override List<INodeOrToken> Children => new List<INodeOrToken> { Expression };
+        public KSyntaxToken Period { get; } = new KSyntaxToken { Kind = KSyntaxKind.Period, Text = "." };
+
+        public override List<INodeOrToken> Children => new List<INodeOrToken> { Expression, Period };
 
         public ExpressionStatementNode()
         {

@@ -28,5 +28,6 @@ namespace KerbalAnalysis.Nodes
         }
 
         public IEnumerable<INodeOrToken> DescendantNodes() => DescendantNodesAndTokens().OfType<KNode>();
+        public IEnumerable<INodeOrToken> DescendantTokens() => DescendantNodesAndTokens().OfType<KSyntaxToken>();
     }
 }

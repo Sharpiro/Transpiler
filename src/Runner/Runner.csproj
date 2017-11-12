@@ -130,9 +130,6 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\KerbalAnalysis\KerbalAnalysis.csproj">
       <Project>{ef32aee3-15ad-45c1-9766-a899e25f9b2e}</Project>
       <Name>KerbalAnalysis</Name>

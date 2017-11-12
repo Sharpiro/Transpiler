@@ -47,16 +47,16 @@ namespace KerbalAnalysis
             return new InvocationExpressionNode();
         }
 
-        public static IdentifierNameExpressionNode IdentifierNameExpression(SyntaxToken identifier)
+        public static IdentifierNameExpressionNode IdentifierNameExpression(KSyntaxToken identifier)
         {
             var identifierNameExpression = new IdentifierNameExpressionNode(identifier);
             identifier.Parent = identifierNameExpression;
             return identifierNameExpression;
         }
 
-        public static SyntaxToken Identifier(string name)
+        public static KSyntaxToken Identifier(string name)
         {
-            return new SyntaxToken
+            return new KSyntaxToken
             {
                 Text = name,
                 Kind = KSyntaxKind.IdentifierToken
@@ -73,15 +73,15 @@ namespace KerbalAnalysis
             return new ArgumentNode();
         }
 
-        public static LiteralExpressionNode LiteralExpression(KSyntaxKind stringLiteralExpression, SyntaxToken token)
+        public static LiteralExpressionNode LiteralExpression(KSyntaxKind stringLiteralExpression, KSyntaxToken token)
         {
             return new LiteralExpressionNode(KSyntaxKind.StringLiteralExpression, token);
 
         }
 
-        public static SyntaxToken Literal(string stringLiteral)
+        public static KSyntaxToken Literal(string stringLiteral)
         {
-            return new SyntaxToken
+            return new KSyntaxToken
             {
                 Text = stringLiteral,
                 Kind = KSyntaxKind.StringLiteralToken

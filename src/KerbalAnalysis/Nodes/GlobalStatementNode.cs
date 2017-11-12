@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace KerbalAnalysis.Nodes
 {
-    public class GlobalStatementNode : KNode
+    public class GlobalStatementNode : MemberDeclarationNode
     {
         public StatementNode Statement { get; set; }
         public override List<INodeOrToken> Children => new List<INodeOrToken> { Statement };
