@@ -5,6 +5,12 @@ namespace KerbalAnalysis
 {
     public class KSyntaxToken : INodeOrToken
     {
+        internal KSyntaxToken(KSyntaxKind kind, string text)
+        {
+            Kind = kind;
+            Text = text;
+        }
+
         public KSyntaxKind Kind { get; set; }
         public string Text { get; set; }
         public int StartIndex { get; set; }

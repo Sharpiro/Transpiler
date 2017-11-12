@@ -1,6 +1,6 @@
-﻿using System;
-using KerbalAnalysis.Nodes;
-using System.Linq;
+﻿using KerbalAnalysis.Nodes;
+using System.Collections.Generic;
+using System;
 
 namespace KerbalAnalysis
 {
@@ -9,32 +9,28 @@ namespace KerbalAnalysis
         public static GlobalStatementNode GlobalStatement()
         {
             var globalStatement = new GlobalStatementNode();
-            //var expressionStatementNode = new ExpressionStatementNode();
-            //globalStatement.Statement = expressionStatementNode;
-            //var invocationExpression = new InvocationExpressionNode();
-            //expressionStatementNode.Expression = invocationExpression;
-            //var identifierToken = new SyntaxToken
-            //{
-            //    Kind = KSyntaxKind.IdentifierToken,
-            //    Text = "log",
-            //};
-            //var identifierNameExpression = new IdentifierNameExpressionNode(identifierToken);
-            //invocationExpression.Expression = identifierNameExpression;
-            //invocationExpression.ArgumentList = new ArgumentListNode();
-            //var argument = new ArgumentNode();
-            //var stringToken = new SyntaxToken
-            //{
-            //    Kind = KSyntaxKind.StringLiteralToken,
-            //    Text = "first"
-            //};
-            //argument.Expression = new LiteralExpressionNode(KSyntaxKind.StringLiteralExpression, stringToken);
-
-            //invocationExpression.ArgumentList.Arguments.Add(
-            //    argument
-            //);
-
 
             return globalStatement;
+        }
+
+        public static KSyntaxToken Token(KSyntaxKind openParenToken, int startIndex = 0, int endIndex = 0)
+        {
+            string text;
+            switch (openParenToken)
+            {
+                case KSyntaxKind.OpenParenToken:
+                    text = "(";
+                    break;
+                case KSyntaxKind.CloseParenToken:
+                    text = ")";
+                    break;
+                case KSyntaxKind.Period:
+                    text = ".";
+                    break;
+                default:
+                    throw new KeyNotFoundException($"Unable to find token text value for '{openParenToken}'");
+            }
+            return new KSyntaxToken(openParenToken, text) { StartIndex = startIndex, EndIndex = endIndex };
         }
 
         public static ExpressionStatementNode ExpressionStatement()
@@ -56,16 +52,14 @@ namespace KerbalAnalysis
 
         public static KSyntaxToken Identifier(string name)
         {
-            return new KSyntaxToken
-            {
-                Text = name,
-                Kind = KSyntaxKind.IdentifierToken
-            };
+            return new KSyntaxToken(KSyntaxKind.IdentifierToken, name);
         }
 
         public static ArgumentListNode ArgumentList()
         {
-            return new ArgumentListNode();
+            var openParenToken = Token(KSyntaxKind.OpenParenToken);
+            var closeParenToken = Token(KSyntaxKind.OpenParenToken);
+            return new ArgumentListNode().WithOpenParenToken(openParenToken).WithCloseParenToken(closeParenToken);
         }
 
         public static ArgumentNode Argument()
@@ -81,11 +75,17 @@ namespace KerbalAnalysis
 
         public static KSyntaxToken Literal(string stringLiteral)
         {
-            return new KSyntaxToken
-            {
-                Text = stringLiteral,
-                Kind = KSyntaxKind.StringLiteralToken
-            };
+            return new KSyntaxToken(KSyntaxKind.StringLiteralToken, stringLiteral);
+        }
+
+        public static AssignmentExpressionNode AssignmentExpression(KSyntaxKind simpleAssignmentExpression, ExpressionNode left, ExpressionNode right)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static AssignmentExpressionNode AssignmentExpression(KSyntaxKind simpleAssignmentExpression)
+        {
+            return new AssignmentExpressionNode();
         }
     }
 }

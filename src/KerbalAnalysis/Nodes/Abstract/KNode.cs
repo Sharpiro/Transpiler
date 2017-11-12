@@ -1,6 +1,6 @@
 ﻿using KerbalAnalysis.Nodes.Abstract;
-using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace KerbalAnalysis.Nodes
@@ -9,7 +9,7 @@ namespace KerbalAnalysis.Nodes
     {
         public KNode Parent { get; set; }
         public KSyntaxKind Kind { get; set; }
-        public abstract List<INodeOrToken> Children { get; }
+        public abstract ImmutableList<INodeOrToken> Children { get; }
 
         public IEnumerable<INodeOrToken> DescendantNodesAndTokens()
         {

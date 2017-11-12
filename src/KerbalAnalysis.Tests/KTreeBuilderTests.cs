@@ -12,16 +12,15 @@ namespace KerbalAnalysis.Tests
         private KTreeBuilder _kTreeBuilder = new KTreeBuilder();
 
         [TestMethod]
-        public void NodesTest()
+        public void InvocationTest()
         {
-            ; var source =
+            var source =
 @"log(""first"")";
             var script = CSharpScript.Create(source);
             var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
             var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
             var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
             var nodes = compilation.DescendantNodes().ToList();
-            var nodesAndTokens = compilation.DescendantNodesAndTokens();
             var kNodes = kCompilation.DescendantNodes().ToList();
             Assert.AreEqual(nodes.Count, kNodes.Count);
 
@@ -31,25 +30,23 @@ namespace KerbalAnalysis.Tests
             }
         }
 
-        [TestMethod]
-        public void TokensTest()
-        {
-            ; var source =
-@"log(""first"")";
-            var script = CSharpScript.Create(source);
-            var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
-            var tokens = compilation.DescendantTokens().ToList();
-            var kTokens = kCompilation.DescendantTokens().ToList();
-            var temp = SyntaxKind.DisabledTextTrivia;
+//        [TestMethod]
+//        public void AssignmentExpressionTest()
+//        {
+//            var source =
+//@"throttle = 1";
+//            var script = CSharpScript.Create(source);
+//            var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
+//            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+//            var nodes = compilation.DescendantNodes().ToList();
+//            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
+//            var kNodes = kCompilation.DescendantNodes().ToList();
+//            Assert.AreEqual(nodes.Count, kNodes.Count);
 
-            Assert.AreEqual(tokens.Count, kTokens.Count);
-
-            for (var i = 0; i < tokens.Count; i++)
-            {
-                Assert.AreEqual((int)tokens[i].Kind(), (int)kTokens[i].Kind);
-            }
-        }
+//            for (var i = 0; i < nodes.Count; i++)
+//            {
+//                Assert.AreEqual((int)nodes[i].Kind(), (int)kNodes[i].Kind);
+//            }
+//        }
     }
 }

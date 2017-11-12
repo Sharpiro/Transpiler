@@ -15,7 +15,6 @@ namespace ConsoleApp2
 @"log(""first"")";
             try
             {
-                ArgumentListSyntax
                 var kGlobalStatement = KSyntaxFactory.GlobalStatement();
                 var script = CSharpScript.Create(source);
                 var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();

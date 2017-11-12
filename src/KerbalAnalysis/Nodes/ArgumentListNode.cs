@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
-using KerbalAnalysis.Nodes.Abstract;
-using System.Linq;
+﻿using KerbalAnalysis.Nodes.Abstract;
+using System.Collections.Immutable;
 
 namespace KerbalAnalysis.Nodes
 {
     public class ArgumentListNode : KNode
     {
-        public List<ArgumentNode> Arguments { get; set; } = new List<ArgumentNode>();
-        public override List<INodeOrToken> Children => Arguments.Cast<INodeOrToken>().ToList();
+        public KSyntaxToken OpenParenToken { get; set; }
+        public ImmutableList<ArgumentNode> Arguments { get; private set; } = ImmutableList.Create<ArgumentNode>();
+        public int Count { get; private set; }
+        public KSyntaxToken CloseParenToken { get; set; }
 
-        public ArgumentListNode()
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(OpenParenToken).AddRange(Arguments).Add(CloseParenToken);
+
+        internal ArgumentListNode()
         {
             Kind = KSyntaxKind.ArgumentList;
         }
@@ -17,7 +20,22 @@ namespace KerbalAnalysis.Nodes
         public ArgumentListNode AddArgument(ArgumentNode argument)
         {
             argument.Parent = this;
-            Arguments.Add(argument);
+            Arguments = Arguments.Add(argument);
+            Count++;
+            return this;
+        }
+
+        public ArgumentListNode WithOpenParenToken(KSyntaxToken openParentToken)
+        {
+            openParentToken.Parent = this;
+            OpenParenToken = openParentToken;
+            return this;
+        }
+
+        public ArgumentListNode WithCloseParenToken(KSyntaxToken closeParentToken)
+        {
+            closeParentToken.Parent = this;
+            CloseParenToken = closeParentToken;
             return this;
         }
     }

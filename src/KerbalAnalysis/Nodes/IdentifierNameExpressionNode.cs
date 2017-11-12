@@ -1,12 +1,12 @@
 ﻿using KerbalAnalysis.Nodes.Abstract;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace KerbalAnalysis.Nodes
 {
     public class IdentifierNameExpressionNode : ExpressionNode
     {
         public KSyntaxToken Identifier { get; set; }
-        public override List<INodeOrToken> Children => new List<INodeOrToken> { Identifier };
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Identifier);
 
         public IdentifierNameExpressionNode(KSyntaxToken identifier)
         {

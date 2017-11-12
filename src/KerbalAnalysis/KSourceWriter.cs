@@ -1,6 +1,5 @@
 ﻿using KerbalAnalysis.Nodes;
 using KerbalAnalysis.Nodes.Abstract;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,19 +16,21 @@ namespace KerbalAnalysis
             return _builder.ToString();
         }
 
-        private void WriteGlobalStatements(List<MemberDeclarationNode> globalStatements)
+        private void WriteGlobalStatements(IReadOnlyList<MemberDeclarationNode> globalStatements)
         {
+            var counter = 0;
             foreach (GlobalStatementNode globalStatement in globalStatements)
             {
+                if (counter != 0) _builder.AppendLine();
                 switch (globalStatement.Statement.Kind)
                 {
                     case KSyntaxKind.ExpressionStatement:
-                        WriteExpressionStatement(globalStatement.Statement);
+                        WriteExpressionStatement(globalStatement.Statement as ExpressionStatementNode);
                         break;
                     default:
-                        throw new KeyNotFoundException($"couldn't find statement with name '{globalStatement.Kind()}'");
+                        throw new KeyNotFoundException($"couldn't find statement with name '{globalStatement.Kind}'");
                 }
-                //compilationUnit.AddMember(kGlobalStatement);
+                counter++;
             }
         }
 
@@ -53,7 +54,7 @@ namespace KerbalAnalysis
                     WriteIdentifierNameExpression(expression as IdentifierNameExpressionNode);
                     break;
                 default:
-                    throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind()}'");
+                    throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind}'");
             }
         }
 
@@ -75,20 +76,21 @@ namespace KerbalAnalysis
 
         private void WriteArgumentList(ArgumentListNode argumentList)
         {
-            //var kArgumentList = KSyntaxFactory.ArgumentList();
-            //invocationExpression.WithArgumentList(kArgumentList);
+            if (argumentList.Count > 0)
+                _builder.Append(argumentList.OpenParenToken.Text);
 
             foreach (var argument in argumentList.Arguments)
             {
                 WriteArgument(argument);
             }
+
+            if (argumentList.Count > 0)
+                _builder.Append(argumentList.CloseParenToken.Text);
         }
 
         private void WriteArgument(ArgumentNode argument)
         {
-            var kArgument = KSyntaxFactory.Argument();
-            WriteExpression(argument.Expression, kArgument);
-            argumentList.AddArgument(kArgument);
+            WriteExpression(argument.Expression);
         }
     }
 }

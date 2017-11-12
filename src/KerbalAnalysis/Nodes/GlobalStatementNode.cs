@@ -1,12 +1,12 @@
 ﻿using KerbalAnalysis.Nodes.Abstract;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace KerbalAnalysis.Nodes
 {
     public class GlobalStatementNode : MemberDeclarationNode
     {
         public StatementNode Statement { get; set; }
-        public override List<INodeOrToken> Children => new List<INodeOrToken> { Statement };
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Statement);
 
         public GlobalStatementNode()
         {

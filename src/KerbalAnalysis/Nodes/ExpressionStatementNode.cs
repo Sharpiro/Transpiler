@@ -1,14 +1,14 @@
 ﻿using KerbalAnalysis.Nodes.Abstract;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace KerbalAnalysis.Nodes
 {
     public class ExpressionStatementNode : StatementNode
     {
         public ExpressionNode Expression { get; set; }
-        public KSyntaxToken Period { get; } = new KSyntaxToken { Kind = KSyntaxKind.Period, Text = "." };
+        public KSyntaxToken Period { get; } = KSyntaxFactory.Token(KSyntaxKind.Period);
 
-        public override List<INodeOrToken> Children => new List<INodeOrToken> { Expression, Period };
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Expression, Period);
 
         public ExpressionStatementNode()
         {

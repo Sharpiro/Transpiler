@@ -1,12 +1,13 @@
 ﻿using KerbalAnalysis.Nodes.Abstract;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace KerbalAnalysis.Nodes
 {
     public class ArgumentNode : KNode
     {
         public ExpressionNode Expression { get; set; }
-        public override List<INodeOrToken> Children => new List<INodeOrToken> { Expression };
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Expression);
+
 
         public ArgumentNode()
         {

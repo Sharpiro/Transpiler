@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using KerbalAnalysis.Nodes.Abstract;
+﻿using KerbalAnalysis.Nodes.Abstract;
+using System.Collections.Immutable;
 
 namespace KerbalAnalysis.Nodes
 {
@@ -8,7 +7,7 @@ namespace KerbalAnalysis.Nodes
     {
         public ExpressionNode Expression { get; set; }
         public ArgumentListNode ArgumentList { get; set; }
-        public override List<INodeOrToken> Children => new List<INodeOrToken> { Expression, ArgumentList };
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Expression, ArgumentList);
 
         public InvocationExpressionNode()
         {

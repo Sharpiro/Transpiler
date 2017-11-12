@@ -12,6 +12,9 @@
         StringLiteralToken = 8511,
         GlobalStatement = 8841,
         ArgumentList = 8636,
-        Period = 8842
+        Period = 8842,
+        OpenParenToken = 8200,
+        CloseParenToken = 8201,
+        SimpleAssignmentExpression = 8714,
     }
 }
