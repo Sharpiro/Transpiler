@@ -8,4 +8,4 @@ print("Counting down:")
 //     PRINT "..." + countdown.
 //     WAIT 1.
 // }
-// for( int x=10; x > 0; --x ) {...}
+// for (int i = 0; i < 10; i++) { }

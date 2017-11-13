@@ -56,6 +56,11 @@ namespace KerbalAnalysis
             return identifierNameExpression;
         }
 
+        public static FieldDeclarationNode FieldDeclaration()
+        {
+            return new FieldDeclarationNode();
+        }
+
         public static KSyntaxToken Identifier(string name)
         {
             return new KSyntaxToken(KSyntaxKind.IdentifierToken, name);

@@ -19,8 +19,8 @@ namespace KerbalAnalysis.Tests
 @"log(""first"")";
             var script = CSharpScript.Create(source);
             var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
+            //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+            var kCompilation = _kTreeBuilder.CreateCompilation(compilation);
 
             var kSource = _kSourceWriter.GetSourceCode(kCompilation);
 
@@ -38,8 +38,8 @@ print("" == HELLO WORLD == "")";
 print("" == HELLO WORLD == "").";
             var script = CSharpScript.Create(source);
             var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
+            //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+            var kCompilation = _kTreeBuilder.CreateCompilation(compilation);
 
             var kSource = _kSourceWriter.GetSourceCode(kCompilation);
 
@@ -55,8 +55,8 @@ print("" == HELLO WORLD == "").";
 @"set throttle to 1.0.";
             var script = CSharpScript.Create(source);
             var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-            var kCompilation = _kTreeBuilder.CreateCompilation(globalStatements);
+            //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+            var kCompilation = _kTreeBuilder.CreateCompilation(compilation);
 
             var kSource = _kSourceWriter.GetSourceCode(kCompilation);
 

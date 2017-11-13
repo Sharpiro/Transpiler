@@ -121,13 +121,18 @@
     <Compile Include="Nodes\ArgumentNode.cs" />
     <Compile Include="Nodes\AssignmentExpressionNode.cs" />
     <Compile Include="Nodes\CompilationUnitNode.cs" />
+    <Compile Include="Nodes\EqualsValueClauseNode.cs" />
     <Compile Include="Nodes\ExpressionStatementNode.cs" />
+    <Compile Include="Nodes\FieldDeclarationNode.cs" />
+    <Compile Include="Nodes\ForStatementNode.cs" />
     <Compile Include="Nodes\GlobalStatementNode.cs" />
     <Compile Include="Nodes\IdentifierNameExpressionNode.cs" />
     <Compile Include="Nodes\InvocationExpressionNode.cs" />
     <Compile Include="Nodes\Abstract\KNode.cs" />
     <Compile Include="Nodes\Abstract\StatementNode.cs" />
     <Compile Include="Nodes\LiteralExpressionNode.cs" />
+    <Compile Include="Nodes\VariableDeclarationNode.cs" />
+    <Compile Include="Nodes\VariableDeclaratorNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

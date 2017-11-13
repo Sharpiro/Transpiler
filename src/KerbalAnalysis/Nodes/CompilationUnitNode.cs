@@ -18,7 +18,7 @@ namespace KerbalAnalysis.Nodes
             return this;
         }
 
-        public CompilationUnitNode WithMembers(IEnumerable<GlobalStatementNode> kGlobalStatements)
+        public CompilationUnitNode WithMembers(IEnumerable<MemberDeclarationNode> kGlobalStatements)
         {
             Members = Members.Clear();
             foreach (var kGlobalStatement in kGlobalStatements)

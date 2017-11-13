@@ -18,9 +18,9 @@ namespace ConsoleApp2
                 var kGlobalStatement = KSyntaxFactory.GlobalStatement();
                 var script = CSharpScript.Create(source);
                 var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-                var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
+                //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
                 var kTreeBuilder = new KTreeBuilder();
-                var kCompilation = kTreeBuilder.CreateCompilation(globalStatements);
+                var kCompilation = kTreeBuilder.CreateCompilation(compilation);
                 var nodes = compilation.DescendantNodes().ToList();
                 var kNodes = kCompilation.DescendantNodes().ToList();
             }

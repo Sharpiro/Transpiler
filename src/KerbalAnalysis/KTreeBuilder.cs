@@ -2,48 +2,88 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
+using System.Linq;
+using KerbalAnalysis.Nodes.Abstract;
 using System;
 
 namespace KerbalAnalysis
 {
     public class KTreeBuilder
     {
-        public CompilationUnitNode CreateCompilation(List<GlobalStatementSyntax> globalStatements)
+        public CompilationUnitNode CreateCompilation(CompilationUnitSyntax compilation)
         {
             var kCompilation = new CompilationUnitNode();
-            var kGlobalStatements = ParseGlobalStatements(globalStatements);
-            kCompilation.WithMembers(kGlobalStatements);
+            var kMembers = ParseMembers(compilation.Members.ToList());
+            kCompilation.WithMembers(kMembers);
             return kCompilation;
         }
 
-        private IEnumerable<GlobalStatementNode> ParseGlobalStatements(List<GlobalStatementSyntax> globalStatements)
+        private IEnumerable<MemberDeclarationNode> ParseMembers(List<MemberDeclarationSyntax> members)
         {
-            foreach (var globalStatement in globalStatements)
+            foreach (var member in members)
             {
-                var kGlobalStatement = new GlobalStatementNode();
-                ExpressionStatementNode expressionStatement;
-                switch (globalStatement.Statement.Kind())
-                {
-                    //case SyntaxKind.ForStatement:
-                    //    ParseForStatement(globalStatement.Statement as ForStatementSyntax, kGlobalStatement);
-                    //    break;
-                    case SyntaxKind.ExpressionStatement:
-                        expressionStatement = ParseExpressionStatement(globalStatement.Statement as ExpressionStatementSyntax);
-                        break;
-                    default:
-                        throw new KeyNotFoundException($"couldn't find statement with name '{globalStatement.Kind()}'");
-                }
-                kGlobalStatement.WithStatement(expressionStatement);
-                yield return kGlobalStatement;
+                yield return ParseMember(member);
             }
         }
 
-        //private  void ParseForStatement(ForStatementSyntax forStatement, GlobalStatementNode newKGlobalStatement)
+        private MemberDeclarationNode ParseMember(MemberDeclarationSyntax member)
+        {
+            MemberDeclarationNode memberDeclarationNode;
+            switch (member.Kind())
+            {
+                case SyntaxKind.GlobalStatement:
+                    memberDeclarationNode = ParseGlobalStatement(member as GlobalStatementSyntax);
+                    break;
+                case SyntaxKind.FieldDeclaration:
+                    memberDeclarationNode = ParseFieldDeclaration(member as FieldDeclarationSyntax);
+                    break;
+                default:
+                    throw new KeyNotFoundException($"couldn't find member with name '{member.Kind()}'");
+            }
+            return memberDeclarationNode;
+        }
+
+        private FieldDeclarationNode ParseFieldDeclaration(FieldDeclarationSyntax fieldDeclaration)
+        {
+            FieldDeclarationNode kFieldDeclaration = KSyntaxFactory.FieldDeclaration();
+
+
+            throw new NotImplementedException();
+        }
+
+        private GlobalStatementNode ParseGlobalStatement(GlobalStatementSyntax globalStatement)
+        {
+            var kGlobalStatement = new GlobalStatementNode();
+            var statement = ParseStatement(globalStatement.Statement);
+            kGlobalStatement.WithStatement(statement);
+            return kGlobalStatement;
+        }
+
+        private StatementNode ParseStatement(StatementSyntax statement)
+        {
+            ExpressionStatementNode expressionStatement;
+            switch (statement.Kind())
+            {
+                //case SyntaxKind.ForStatement:
+                //    expressionStatement = ParseForStatement(globalStatement.Statement as ForStatementSyntax);
+                //    break;
+                case SyntaxKind.ExpressionStatement:
+                    expressionStatement = ParseExpressionStatement(statement as ExpressionStatementSyntax);
+                    break;
+                default:
+                    throw new KeyNotFoundException($"couldn't find statement with name '{statement.Kind()}'");
+            }
+            return expressionStatement;
+        }
+
+        //private ForStatementNode ParseForStatement(ForStatementSyntax forStatement)
         //{
-        //    var localVarName = "countdown";
-        //    var initValue = 10;
-        //    var conditionalExpression = "countdown = 0";
-        //    var statement = $"FROM {{local {localVarName} is {initValue}.}} {conditionalExpression} STEP {{SET {localVarName} to {localVarName} - 1.}} DO";
+        //    //var localVarName = "countdown";
+        //    //var initValue = 10;
+        //    //var conditionalExpression = "countdown = 0";
+        //    //var statement = $"FROM {{local {localVarName} is {initValue}.}} {conditionalExpression} STEP {{SET {localVarName} to {localVarName} - 1.}} DO";
+
+        //    throw new NotImplementedException();
         //}
 
         private ExpressionStatementNode ParseExpressionStatement(ExpressionStatementSyntax expressionStatement)
