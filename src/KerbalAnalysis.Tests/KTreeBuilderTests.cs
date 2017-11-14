@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
@@ -45,6 +44,7 @@ namespace KerbalAnalysis.Tests
 
         private void TestNodes(string source)
         {
+            var x = SyntaxKind.AbstractKeyword;
             var script = CSharpScript.Create(source);
             var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
             //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();

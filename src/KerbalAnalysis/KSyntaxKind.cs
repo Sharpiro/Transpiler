@@ -19,5 +19,12 @@
         SimpleAssignmentExpression = 8714,
         SetKeyword = 8843,
         ToKeyword = 8844,
+        VariableDeclaration = 8794,
+        FieldDeclaration = 8873,
+        VariableDeclarator = 8795,
+        EqualsValueClause = 8796,
+        LocalKeyword = 8874,
+        IsKeyword = 8875,
+        PredefinedType = 8621,
     }
 }

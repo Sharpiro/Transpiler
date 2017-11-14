@@ -7,6 +7,25 @@ namespace KerbalAnalysis.Nodes
     {
         public KSyntaxToken Identifier { get; set; }
         public EqualsValueClauseNode Initializer { get; set; }
-        public override ImmutableList<INodeOrToken> Children => throw new System.NotImplementedException();
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Identifier, Initializer);
+
+        internal VariableDeclaratorNode()
+        {
+            Kind = KSyntaxKind.VariableDeclarator;
+        }
+
+        public VariableDeclaratorNode WithIdentifier(KSyntaxToken identifier)
+        {
+            identifier.Parent = this;
+            Identifier = identifier;
+            return this;
+        }
+
+        public VariableDeclaratorNode WithInitializer(EqualsValueClauseNode initializer)
+        {
+            initializer.Parent = this;
+            Initializer = initializer;
+            return this;
+        }
     }
 }

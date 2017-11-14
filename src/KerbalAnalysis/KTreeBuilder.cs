@@ -45,10 +45,62 @@ namespace KerbalAnalysis
 
         private FieldDeclarationNode ParseFieldDeclaration(FieldDeclarationSyntax fieldDeclaration)
         {
-            FieldDeclarationNode kFieldDeclaration = KSyntaxFactory.FieldDeclaration();
+            var declaration = ParseDeclaration(fieldDeclaration.Declaration);
+            var kFieldDeclaration = KSyntaxFactory.FieldDeclaration()
+                .WithVariableDeclaration(declaration)
+                .WithPeriod(KSyntaxFactory.Token(KSyntaxKind.Period));
+            return kFieldDeclaration;
+        }
 
+        private VariableDeclarationNode ParseDeclaration(VariableDeclarationSyntax declaration)
+        {
+            var type = ParseType(declaration.Type);
+            var variableDeclarator = ParseDeclarator(declaration.Variables.First());
+            var kDeclaration = KSyntaxFactory.VariableDeclaration()
+                .WithType(type)
+                .WithVariableDeclarator(variableDeclarator);
+            return kDeclaration;
+        }
 
-            throw new NotImplementedException();
+        private TypeNode ParseType(TypeSyntax type)
+        {
+            TypeNode kType;
+            switch (type.Kind())
+            {
+                case SyntaxKind.PredefinedType:
+                    kType = ParsePredefinedType(type as PredefinedTypeSyntax);
+                    break;
+                default:
+                    throw new KeyNotFoundException($"couldn't find member with name '{type.Kind()}'");
+            }
+            return kType;
+        }
+
+        private PredefinedTypeNode ParsePredefinedType(PredefinedTypeSyntax type)
+        {
+            var keyword = KSyntaxFactory.Token(KSyntaxKind.LocalKeyword);
+            var kPredefinedType = KSyntaxFactory.PredefinedType(keyword);
+            return kPredefinedType;
+        }
+
+        private VariableDeclaratorNode ParseDeclarator(VariableDeclaratorSyntax variableDeclaratorSyntax)
+        {
+            var identifier = KSyntaxFactory.Identifier(variableDeclaratorSyntax.Identifier.Text);
+            var initializer = ParseInitializer(variableDeclaratorSyntax.Initializer);
+            var kDeclarator = KSyntaxFactory.VariableDeclarator()
+                .WithIdentifier(identifier)
+                .WithInitializer(initializer);
+            return kDeclarator;
+        }
+
+        private EqualsValueClauseNode ParseInitializer(EqualsValueClauseSyntax initializer)
+        {
+            var isToken = KSyntaxFactory.Token(KSyntaxKind.IsKeyword);
+            var value = ParseExpression(initializer.Value);
+            var kInitializer = KSyntaxFactory.EqualsValueClause()
+                .WithIsKeyword(isToken)
+                .WithValue(value);
+            return kInitializer;
         }
 
         private GlobalStatementNode ParseGlobalStatement(GlobalStatementSyntax globalStatement)
@@ -130,8 +182,8 @@ namespace KerbalAnalysis
 
         private LiteralExpressionNode ParseLiteralExpression(LiteralExpressionSyntax literalExpression)
         {
-            var stringLiteral = literalExpression.Token.Text;
-            var kLiteralExpression = KSyntaxFactory.LiteralExpression((KSyntaxKind)literalExpression.Kind(), KSyntaxFactory.Literal(stringLiteral));
+            var value = literalExpression.Token.Text;
+            var kLiteralExpression = KSyntaxFactory.LiteralExpression((KSyntaxKind)literalExpression.Kind(), KSyntaxFactory.Literal(value));
             return kLiteralExpression;
         }
 

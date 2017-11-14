@@ -12,32 +12,99 @@ namespace KerbalAnalysis
         public string GetSourceCode(CompilationUnitNode compilation)
         {
             _builder.Clear();
-            WriteGlobalStatements(compilation.Members);
+            WriteMembers(compilation.Members);
             return _builder.ToString();
         }
 
-        private void WriteGlobalStatements(IReadOnlyList<MemberDeclarationNode> globalStatements)
+        private void WriteMembers(IReadOnlyList<MemberDeclarationNode> members)
         {
             var counter = 0;
-            foreach (GlobalStatementNode globalStatement in globalStatements)
+            foreach (var member in members)
             {
                 if (counter != 0) _builder.AppendLine();
-                switch (globalStatement.Statement.Kind)
-                {
-                    case KSyntaxKind.ExpressionStatement:
-                        WriteExpressionStatement(globalStatement.Statement as ExpressionStatementNode);
-                        break;
-                    default:
-                        throw new KeyNotFoundException($"couldn't find statement with name '{globalStatement.Kind}'");
-                }
+                WriteMember(member);
                 counter++;
+            }
+        }
+
+        private void WriteMember(MemberDeclarationNode member)
+        {
+            switch (member.Kind)
+            {
+                case KSyntaxKind.GlobalStatement:
+                    WriteGlobalStatement(member as GlobalStatementNode);
+                    break;
+                case KSyntaxKind.FieldDeclaration:
+                    WriteFieldDeclaration(member as FieldDeclarationNode);
+                    break;
+                default: throw new KeyNotFoundException($"couldn't find member with name '{member.Kind}'");
+            }
+        }
+
+        private void WriteFieldDeclaration(FieldDeclarationNode fieldDeclarationNode)
+        {
+            WriteDeclaration(fieldDeclarationNode.Declaration);
+            _builder.Append(fieldDeclarationNode.PeriodToken);
+        }
+
+        private void WriteDeclaration(VariableDeclarationNode declaration)
+        {
+            WriteType(declaration.Type);
+            WriteDeclarator(declaration.Declarator);
+        }
+
+        private void WriteType(TypeNode type)
+        {
+            switch (type.Kind)
+            {
+                case KSyntaxKind.PredefinedType:
+                    WritePredefinedType(type as PredefinedTypeNode);
+                    break;
+                default: throw new KeyNotFoundException($"couldn't find type node with name '{type.Kind}'");
+            }
+        }
+
+        private void WritePredefinedType(PredefinedTypeNode type)
+        {
+            _builder.Append(type.Keyword);
+            _builder.Append(" ");
+        }
+
+        private void WriteDeclarator(VariableDeclaratorNode declarator)
+        {
+            _builder.Append(declarator.Identifier);
+            _builder.Append(" ");
+            WriteInitializer(declarator.Initializer);
+        }
+
+        private void WriteInitializer(EqualsValueClauseNode initializer)
+        {
+            _builder.Append(initializer.IsToken);
+            _builder.Append(" ");
+            WriteExpression(initializer.Value);
+        }
+
+        private void WriteGlobalStatement(GlobalStatementNode globalStatement)
+        {
+            WriteStatement(globalStatement.Statement);
+        }
+
+        private void WriteStatement(StatementNode statement)
+        {
+            switch (statement.Kind)
+            {
+                case KSyntaxKind.ExpressionStatement:
+                    WriteExpressionStatement(statement as ExpressionStatementNode);
+                    break;
+                default:
+                    throw new KeyNotFoundException($"couldn't find statement with name '{statement.Kind}'");
             }
         }
 
         private void WriteExpressionStatement(ExpressionStatementNode expressionStatement)
         {
             WriteExpression(expressionStatement.Expression);
-            _builder.Append(expressionStatement.Period);
+            _builder.Append(expressionStatement.PeriodToken);
         }
 
         private void WriteExpression(ExpressionNode expression)

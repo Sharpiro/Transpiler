@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
@@ -17,14 +16,8 @@ namespace KerbalAnalysis.Tests
         {
             var source =
 @"log(""first"")";
-            var script = CSharpScript.Create(source);
-            var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-            var kCompilation = _kTreeBuilder.CreateCompilation(compilation);
-
-            var kSource = _kSourceWriter.GetSourceCode(kCompilation);
-
-            Assert.AreEqual("log(\"first\").", kSource);
+            var expectedOutput = "log(\"first\").";
+            TestOutput(source, expectedOutput);
         }
 
         [TestMethod]
@@ -36,14 +29,7 @@ print("" == HELLO WORLD == "")";
             var expectedOutput =
 @"clearscreen.
 print("" == HELLO WORLD == "").";
-            var script = CSharpScript.Create(source);
-            var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
-            var kCompilation = _kTreeBuilder.CreateCompilation(compilation);
-
-            var kSource = _kSourceWriter.GetSourceCode(kCompilation);
-
-            Assert.AreEqual(expectedOutput, kSource);
+            TestOutput(source, expectedOutput);
         }
 
         [TestMethod]
@@ -53,9 +39,23 @@ print("" == HELLO WORLD == "").";
 @"throttle = 1.0";
             var expectedOutput =
 @"set throttle to 1.0.";
-            var script = CSharpScript.Create(source);
+            TestOutput(source, expectedOutput);
+        }
+
+        [TestMethod]
+        public void VariableDeclarationTest()
+        {
+            var source =
+@"int countdown = 10";
+            var expectedOutput =
+@"local countdown is 10.";
+            TestOutput(source, expectedOutput);
+        }
+
+        private void TestOutput(string input, string expectedOutput)
+        {
+            var script = CSharpScript.Create(input);
             var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
             var kCompilation = _kTreeBuilder.CreateCompilation(compilation);
 
             var kSource = _kSourceWriter.GetSourceCode(kCompilation);

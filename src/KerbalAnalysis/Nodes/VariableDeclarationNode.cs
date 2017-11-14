@@ -5,7 +5,27 @@ namespace KerbalAnalysis.Nodes
 {
     public class VariableDeclarationNode : KNode
     {
-        public VariableDeclaratorNode Variable { get; set; }
-        public override ImmutableList<INodeOrToken> Children => throw new System.NotImplementedException();
+        public TypeNode Type { get; set; }
+        public VariableDeclaratorNode Declarator { get; set; }
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Type, Declarator);
+
+        public VariableDeclarationNode()
+        {
+            Kind = KSyntaxKind.VariableDeclaration;
+        }
+
+        public VariableDeclarationNode WithType(TypeNode type)
+        {
+            type.Parent = this;
+            Type = type;
+            return this;
+        }
+
+        public VariableDeclarationNode WithVariableDeclarator(VariableDeclaratorNode declarator)
+        {
+            declarator.Parent = this;
+            Declarator = declarator;
+            return this;
+        }
     }
 }

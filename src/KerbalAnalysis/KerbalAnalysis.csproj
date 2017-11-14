@@ -131,6 +131,8 @@
     <Compile Include="Nodes\Abstract\KNode.cs" />
     <Compile Include="Nodes\Abstract\StatementNode.cs" />
     <Compile Include="Nodes\LiteralExpressionNode.cs" />
+    <Compile Include="Nodes\Abstract\TypeNode.cs" />
+    <Compile Include="Nodes\PredefinedTypeNode.cs" />
     <Compile Include="Nodes\VariableDeclarationNode.cs" />
     <Compile Include="Nodes\VariableDeclaratorNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

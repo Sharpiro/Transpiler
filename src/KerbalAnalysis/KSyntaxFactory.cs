@@ -33,6 +33,12 @@ namespace KerbalAnalysis
                 case KSyntaxKind.ToKeyword:
                     text = "to";
                     break;
+                case KSyntaxKind.LocalKeyword:
+                    text = "local";
+                    break;
+                case KSyntaxKind.IsKeyword:
+                    text = "is";
+                    break;
                 default:
                     throw new KeyNotFoundException($"Unable to find token text value for '{openParenToken}'");
             }
@@ -66,6 +72,11 @@ namespace KerbalAnalysis
             return new KSyntaxToken(KSyntaxKind.IdentifierToken, name);
         }
 
+        public static VariableDeclarationNode VariableDeclaration()
+        {
+            return new VariableDeclarationNode();
+        }
+
         public static ArgumentListNode ArgumentList()
         {
             var openParenToken = Token(KSyntaxKind.OpenParenToken);
@@ -73,14 +84,29 @@ namespace KerbalAnalysis
             return new ArgumentListNode().WithOpenParenToken(openParenToken).WithCloseParenToken(closeParenToken);
         }
 
+        public static VariableDeclaratorNode VariableDeclarator()
+        {
+            return new VariableDeclaratorNode();
+        }
+
         public static ArgumentNode Argument()
         {
             return new ArgumentNode();
         }
 
+        public static PredefinedTypeNode PredefinedType(KSyntaxToken keyword)
+        {
+            return new PredefinedTypeNode().WithKeyword(keyword);
+        }
+
         public static LiteralExpressionNode LiteralExpression(KSyntaxKind stringLiteralExpression, KSyntaxToken token)
         {
             return new LiteralExpressionNode(stringLiteralExpression, token);
+        }
+
+        public static EqualsValueClauseNode EqualsValueClause()
+        {
+            return new EqualsValueClauseNode();
         }
 
         public static KSyntaxToken Literal(string stringLiteral)
