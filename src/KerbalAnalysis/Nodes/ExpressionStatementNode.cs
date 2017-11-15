@@ -6,9 +6,9 @@ namespace KerbalAnalysis.Nodes
     public class ExpressionStatementNode : StatementNode
     {
         public ExpressionNode Expression { get; set; }
-        public KSyntaxToken Period { get; } = KSyntaxFactory.Token(KSyntaxKind.Period);
+        public KSyntaxToken PeriodToken { get; } = KSyntaxFactory.Token(KSyntaxKind.Period);
 
-        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Expression, Period);
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Expression, PeriodToken);
 
         public ExpressionStatementNode()
         {
