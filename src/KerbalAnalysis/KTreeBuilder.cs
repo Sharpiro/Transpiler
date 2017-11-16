@@ -113,14 +113,20 @@ namespace KerbalAnalysis
 
         private StatementNode ParseStatement(StatementSyntax statement)
         {
-            ExpressionStatementNode expressionStatement;
+            StatementNode expressionStatement;
             switch (statement.Kind())
             {
-                //case SyntaxKind.ForStatement:
-                //    expressionStatement = ParseForStatement(globalStatement.Statement as ForStatementSyntax);
-                //    break;
+                case SyntaxKind.ForStatement:
+                    expressionStatement = ParseForStatement(statement as ForStatementSyntax);
+                    break;
                 case SyntaxKind.ExpressionStatement:
                     expressionStatement = ParseExpressionStatement(statement as ExpressionStatementSyntax);
+                    break;
+                case SyntaxKind.Block:
+                    expressionStatement = ParseBlockStatement(statement as BlockSyntax);
+                    break;
+                case SyntaxKind.LocalDeclarationStatement:
+                    expressionStatement = ParseLocalDeclarationStatement(statement as LocalDeclarationStatementSyntax);
                     break;
                 default:
                     throw new KeyNotFoundException($"couldn't find statement with name '{statement.Kind()}'");
@@ -128,20 +134,70 @@ namespace KerbalAnalysis
             return expressionStatement;
         }
 
-        //private ForStatementNode ParseForStatement(ForStatementSyntax forStatement)
-        //{
-        //    //var localVarName = "countdown";
-        //    //var initValue = 10;
-        //    //var conditionalExpression = "countdown = 0";
-        //    //var statement = $"FROM {{local {localVarName} is {initValue}.}} {conditionalExpression} STEP {{SET {localVarName} to {localVarName} - 1.}} DO";
+        private LocalDeclarationStatementNode ParseLocalDeclarationStatement(LocalDeclarationStatementSyntax localDeclarationStatementSyntax)
+        {
+            var declaration = ParseDeclaration(localDeclarationStatementSyntax.Declaration);
+            return KSyntaxFactory.LocalDeclarationStatement()
+                .WithDeclaration(declaration)
+                .WithPeriod(KSyntaxFactory.Token(KSyntaxKind.Period));
+            throw new NotImplementedException();
+        }
 
-        //    throw new NotImplementedException();
-        //}
+        private BlockNode ParseBlockStatement(BlockSyntax blockSyntax)
+        {
+            var statements = ParseStatements(blockSyntax.Statements);
+            var kBlockStatment = KSyntaxFactory.Block(statements);
+            return kBlockStatment;
+        }
+
+        private IEnumerable<StatementNode> ParseStatements(IEnumerable<StatementSyntax> statements)
+        {
+            foreach (var statement in statements)
+            {
+                yield return ParseStatement(statement);
+            }
+        }
+
+        private ForStatementNode ParseForStatement(ForStatementSyntax forStatement)
+        {
+            var variableDeclaration = ParseDeclaration(forStatement.Declaration);
+            var condition = ParseExpression(forStatement.Condition);
+            var incrementExpression = ParseExpression(forStatement.Incrementors.First());
+            var kForStatement =
+                KSyntaxFactory.ForStatement()
+                    .WithFromKeyword(KSyntaxFactory.Token(KSyntaxKind.FromKeyword))
+                    .WithDeclarationBlock(
+                        KSyntaxFactory.Block()
+                            .WithOpenBrace(KSyntaxFactory.Token(KSyntaxKind.OpenBraceToken))
+                            .WithStatements(
+                                KSyntaxFactory.LocalDeclarationStatement()
+                                    .WithDeclaration(variableDeclaration)
+                                    .WithPeriod(KSyntaxFactory.Token(KSyntaxKind.Period))
+                            )
+                            .WithCloseBrace(KSyntaxFactory.Token(KSyntaxKind.CloseBraceToken))
+                    )
+                    .WithUntilKeyword(KSyntaxFactory.Token(KSyntaxKind.UntilKeyword))
+                    .WithCondition(condition)
+                    .WithStepKeyword(KSyntaxFactory.Token(KSyntaxKind.StepKeyword))
+                    .WithIncrementBlock(
+                        KSyntaxFactory.Block()
+                        .WithStatements(
+                            KSyntaxFactory.ExpressionStatement()
+                                .WithExpression(incrementExpression)
+                                .WithPeriod(KSyntaxFactory.Token(KSyntaxKind.Period))
+                        )
+                    )
+                    .WithDoKeyword(KSyntaxFactory.Token(KSyntaxKind.DoKeyword))
+                    .WithStatement(ParseStatement(forStatement.Statement));
+            return kForStatement;
+        }
 
         private ExpressionStatementNode ParseExpressionStatement(ExpressionStatementSyntax expressionStatement)
         {
             var expression = ParseExpression(expressionStatement.Expression);
-            var kExpressionStatement = KSyntaxFactory.ExpressionStatement().WithExpression(expression);
+            var kExpressionStatement = KSyntaxFactory.ExpressionStatement()
+                .WithExpression(expression)
+                .WithPeriod(KSyntaxFactory.Token(KSyntaxKind.Period));
             return kExpressionStatement;
         }
 
@@ -163,10 +219,75 @@ namespace KerbalAnalysis
                 case SyntaxKind.SimpleAssignmentExpression:
                     kExpression = ParseSimpleAssignmentExpression(expression as AssignmentExpressionSyntax);
                     break;
-                default:
-                    throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind()}'");
+                case SyntaxKind.AddExpression:
+                case SyntaxKind.LessThanExpression:
+                case SyntaxKind.LessThanOrEqualExpression:
+                case SyntaxKind.GreaterThanExpression:
+                case SyntaxKind.GreaterThanOrEqualExpression:
+                    kExpression = ParseBinaryExpression(expression as BinaryExpressionSyntax);
+                    break;
+                case SyntaxKind.PostIncrementExpression:
+                case SyntaxKind.PostDecrementExpression:
+                    kExpression = ParsePostIncrementExpression(expression as PostfixUnaryExpressionSyntax);
+                    break;
+                default: throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind()}'");
             }
             return kExpression;
+        }
+
+        private ExpressionNode ParsePostIncrementExpression(PostfixUnaryExpressionSyntax unaryExpression)
+        {
+            ExpressionNode rightExpression;
+            var operand = ParseExpression(unaryExpression.Operand);
+
+            switch (unaryExpression.OperatorToken.Kind())
+            {
+                case SyntaxKind.PlusPlusToken:
+                    rightExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.AddExpression)
+                        .WithLeft(operand)
+                        .WithRight(
+                            KSyntaxFactory.LiteralExpression(KSyntaxKind.NumericLiteralExpression,
+                                KSyntaxFactory.Literal(1))
+                        );
+                    break;
+                default: throw new KeyNotFoundException($"couldn't find unary operator with kind '{unaryExpression.Operand.Kind()}'");
+            }
+            var assignmentExpression = KSyntaxFactory.AssignmentExpression(KSyntaxKind.SimpleAssignmentExpression)
+                .WithSetKeyword(KSyntaxFactory.Token(KSyntaxKind.SetKeyword))
+                .WithLeft(operand)
+                .WithToKeyword(KSyntaxFactory.Token(KSyntaxKind.ToKeyword))
+                .WithRight(rightExpression);
+            return assignmentExpression;
+        }
+
+        private BinaryExpressionNode ParseBinaryExpression(BinaryExpressionSyntax binaryExpression)
+        {
+            var left = ParseExpression(binaryExpression.Left);
+            var right = ParseExpression(binaryExpression.Right);
+            KSyntaxKind kBinaryExpressionKind;
+            switch (binaryExpression.Kind())
+            {
+                case SyntaxKind.AddExpression:
+                    kBinaryExpressionKind = KSyntaxKind.AddExpression;
+                    break;
+                case SyntaxKind.LessThanExpression:
+                    kBinaryExpressionKind = KSyntaxKind.LessThanExpression;
+                    break;
+                case SyntaxKind.LessThanOrEqualExpression:
+                    kBinaryExpressionKind = KSyntaxKind.LessThanEqualsToken;
+                    break;
+                case SyntaxKind.GreaterThanExpression:
+                    kBinaryExpressionKind = KSyntaxKind.GreaterThanToken;
+                    break;
+                case SyntaxKind.GreaterThanOrEqualExpression:
+                    kBinaryExpressionKind = KSyntaxKind.GreaterThanEqualsToken;
+                    break;
+                default: throw new KeyNotFoundException($"couldn't find expression with kind '{binaryExpression.Kind()}'");
+            }
+            var kLessThanBinaryExpression = KSyntaxFactory.BinaryExpression(kBinaryExpressionKind)
+                .WithLeft(left)
+                .WithRight(right);
+            return kLessThanBinaryExpression;
         }
 
         private AssignmentExpressionNode ParseSimpleAssignmentExpression(AssignmentExpressionSyntax assignmentExpression)
@@ -176,7 +297,7 @@ namespace KerbalAnalysis
             var to = KSyntaxFactory.Token(KSyntaxKind.ToKeyword);
             var rightExpression = ParseExpression(assignmentExpression.Right);
             var kAssignmentExpression = KSyntaxFactory.AssignmentExpression(KSyntaxKind.SimpleAssignmentExpression)
-                .WithSet(set).WithLeft(leftExpression).WithTo(to).WithRight(rightExpression);
+                .WithSetKeyword(set).WithLeft(leftExpression).WithToKeyword(to).WithRight(rightExpression);
             return kAssignmentExpression;
         }
 

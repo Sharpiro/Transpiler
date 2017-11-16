@@ -5,8 +5,8 @@ namespace KerbalAnalysis.Nodes
 {
     public class ExpressionStatementNode : StatementNode
     {
-        public ExpressionNode Expression { get; set; }
-        public KSyntaxToken PeriodToken { get; } = KSyntaxFactory.Token(KSyntaxKind.Period);
+        public ExpressionNode Expression { get; private set; }
+        public KSyntaxToken PeriodToken { get; private set; }
 
         public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Expression, PeriodToken);
 
@@ -19,6 +19,13 @@ namespace KerbalAnalysis.Nodes
         {
             Expression = expression;
             expression.Parent = this;
+            return this;
+        }
+
+        public ExpressionStatementNode WithPeriod(KSyntaxToken periodToken)
+        {
+            periodToken.Parent = this;
+            PeriodToken = periodToken;
             return this;
         }
     }

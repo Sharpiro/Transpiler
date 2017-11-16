@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
 
 namespace KerbalAnalysis.Tests
@@ -34,29 +35,37 @@ namespace KerbalAnalysis.Tests
             TestNodes(source);
         }
 
-        //        [TestMethod]
-        //        public void ForStatementTest()
-        //        {
-        //            var source =
-        //@"for (int i = 0; i < 10; i++) { }";
-        //            TestNodes(source);
-        //        }
+        [TestMethod]
+        public void AdditionTest()
+        {
+            var source =
+@"countdown = countdown + 1";
+            TestNodes(source);
+        }
+
+//        [TestMethod]
+//        public void ForStatementTest()
+//        {
+//            var source =
+//@"for (int i = 0; i < 10; i++) { }";
+//            TestNodes(source);
+//        }
 
         private void TestNodes(string source)
         {
             var x = SyntaxKind.AbstractKeyword;
             var script = CSharpScript.Create(source);
             var compilation = script.GetCompilation().SyntaxTrees.FirstOrDefault().GetCompilationUnitRoot();
-            //var globalStatements = compilation.DescendantNodes().OfType<GlobalStatementSyntax>().ToList();
             var nodes = compilation.DescendantNodes().ToList();
             var kCompilation = _kTreeBuilder.CreateCompilation(compilation);
             var kNodes = kCompilation.DescendantNodes().ToList();
-            Assert.AreEqual(nodes.Count, kNodes.Count);
 
             for (var i = 0; i < nodes.Count; i++)
             {
                 Assert.AreEqual((int)nodes[i].Kind(), (int)kNodes[i].Kind);
             }
+
+            Assert.AreEqual(nodes.Count, kNodes.Count);
         }
     }
 }

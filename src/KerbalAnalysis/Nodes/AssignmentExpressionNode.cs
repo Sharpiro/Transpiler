@@ -5,17 +5,12 @@ namespace KerbalAnalysis.Nodes
 {
     public class AssignmentExpressionNode : ExpressionNode
     {
-        public KSyntaxToken Set { get; private set; }
+        public KSyntaxToken SetKeyword { get; private set; }
         public ExpressionNode Left { get; private set; }
-        public KSyntaxToken To { get; private set; }
+        public KSyntaxToken ToKeyword { get; private set; }
         public ExpressionNode Right { get; private set; }
 
-        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(Set, Left, To, Right);
-
-        //internal AssignmentExpressionNode(ExpressionNode left, KSyntaxToken operatorToken, ExpressionNode right)
-        //{
-        //    Kind = KSyntaxKind.SimpleAssignmentExpression;
-        //}
+        public override ImmutableList<INodeOrToken> Children => ImmutableList.Create<INodeOrToken>(SetKeyword, Left, ToKeyword, Right);
 
         internal AssignmentExpressionNode()
         {
@@ -36,17 +31,17 @@ namespace KerbalAnalysis.Nodes
             return this;
         }
 
-        public AssignmentExpressionNode WithSet(KSyntaxToken token)
+        public AssignmentExpressionNode WithSetKeyword(KSyntaxToken token)
         {
             token.Parent = this;
-            Set = token;
+            SetKeyword = token;
             return this;
         }
 
-        public AssignmentExpressionNode WithTo(KSyntaxToken token)
+        public AssignmentExpressionNode WithToKeyword(KSyntaxToken token)
         {
             token.Parent = this;
-            To = token;
+            ToKeyword = token;
             return this;
         }
     }

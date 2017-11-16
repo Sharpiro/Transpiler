@@ -2,11 +2,14 @@
 using KerbalAnalysis.Nodes.Abstract;
 using System.Collections.Generic;
 using System.Text;
+using System;
+using System.Collections.Immutable;
 
 namespace KerbalAnalysis
 {
     public class KSourceWriter
     {
+        private const string Space = " ";
         private StringBuilder _builder = new StringBuilder();
 
         public string GetSourceCode(CompilationUnitNode compilation)
@@ -67,20 +70,20 @@ namespace KerbalAnalysis
         private void WritePredefinedType(PredefinedTypeNode type)
         {
             _builder.Append(type.Keyword);
-            _builder.Append(" ");
+            _builder.Append(Space);
         }
 
         private void WriteDeclarator(VariableDeclaratorNode declarator)
         {
             _builder.Append(declarator.Identifier);
-            _builder.Append(" ");
+            _builder.Append(Space);
             WriteInitializer(declarator.Initializer);
         }
 
         private void WriteInitializer(EqualsValueClauseNode initializer)
         {
             _builder.Append(initializer.IsToken);
-            _builder.Append(" ");
+            _builder.Append(Space);
             WriteExpression(initializer.Value);
         }
 
@@ -96,8 +99,57 @@ namespace KerbalAnalysis
                 case KSyntaxKind.ExpressionStatement:
                     WriteExpressionStatement(statement as ExpressionStatementNode);
                     break;
+                case KSyntaxKind.ForStatement:
+                    WriteForStatement(statement as ForStatementNode);
+                    break;
+                case KSyntaxKind.Block:
+                    WriteBlock(statement as BlockNode);
+                    break;
+                case KSyntaxKind.LocalDeclarationStatement:
+                    WriteLocalDeclarationStatement(statement as LocalDeclarationStatementNode);
+                    break;
                 default:
                     throw new KeyNotFoundException($"couldn't find statement with name '{statement.Kind}'");
+            }
+        }
+
+        private void WriteLocalDeclarationStatement(LocalDeclarationStatementNode localDeclarationStatementNode)
+        {
+            WriteDeclaration(localDeclarationStatementNode.Declaration);
+            _builder.Append(localDeclarationStatementNode.PeriodToken);
+        }
+
+        private void WriteForStatement(ForStatementNode forStatementNode)
+        {
+            _builder.Append(forStatementNode.FromKeyword);
+            _builder.Append(Space);
+            WriteBlock(forStatementNode.DeclarationBlock);
+            _builder.Append(Space);
+            _builder.Append(forStatementNode.UntilKeyword);
+            _builder.Append(Space);
+            WriteExpression(forStatementNode.Condition);
+            _builder.Append(Space);
+            _builder.Append(forStatementNode.StepKeyword);
+            _builder.Append(Space);
+            WriteBlock(forStatementNode.IncrementBlock);
+            _builder.Append(Space);
+            _builder.Append(forStatementNode.DoKeyword);
+            _builder.Append(Space);
+            WriteStatement(forStatementNode.Statement);
+        }
+
+        private void WriteBlock(BlockNode declarationBlock)
+        {
+            _builder.Append(declarationBlock.OpenBraceToken);
+            WriteStatements(declarationBlock.Statements);
+            _builder.Append(declarationBlock.CloseBraceToken);
+        }
+
+        private void WriteStatements(ImmutableList<StatementNode> statements)
+        {
+            foreach (var statement in statements)
+            {
+                WriteStatement(statement);
             }
         }
 
@@ -124,17 +176,33 @@ namespace KerbalAnalysis
                 case KSyntaxKind.SimpleAssignmentExpression:
                     WriteSimpleAssignmentExpression(expression as AssignmentExpressionNode);
                     break;
+                case KSyntaxKind.AddExpression:
+                case KSyntaxKind.LessThanExpression:
+                case KSyntaxKind.LessThanOrEqualExpression:
+                case KSyntaxKind.GreaterThanExpression:
+                case KSyntaxKind.GreaterThanOrEqualExpression:
+                    WriteBinaryExpression(expression as BinaryExpressionNode);
+                    break;
                 default:
                     throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind}'");
             }
         }
 
+        private void WriteBinaryExpression(BinaryExpressionNode binaryExpressionNode)
+        {
+            WriteExpression(binaryExpressionNode.Left);
+            _builder.Append(Space);
+            _builder.Append(binaryExpressionNode.OperatorToken);
+            _builder.Append(Space);
+            WriteExpression(binaryExpressionNode.Right);
+        }
+
         private void WriteSimpleAssignmentExpression(AssignmentExpressionNode assignmentExpression)
         {
-            _builder.Append($"{assignmentExpression.Set} ");
+            _builder.Append($"{assignmentExpression.SetKeyword} ");
             WriteExpression(assignmentExpression.Left);
-            _builder.Append(" ");
-            _builder.Append($"{assignmentExpression.To} ");
+            _builder.Append(Space);
+            _builder.Append($"{assignmentExpression.ToKeyword} ");
             WriteExpression(assignmentExpression.Right);
         }
 

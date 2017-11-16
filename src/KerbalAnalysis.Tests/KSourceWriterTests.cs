@@ -52,6 +52,26 @@ print("" == HELLO WORLD == "").";
             TestOutput(source, expectedOutput);
         }
 
+        [TestMethod]
+        public void AdditionTest()
+        {
+            var source =
+@"countdown = countdown + 1";
+            var expectedOutput =
+@"set countdown to countdown + 1.";
+            TestOutput(source, expectedOutput);
+        }
+
+        [TestMethod]
+        public void ForStatementTest()
+        {
+            var source =
+@"for (int countdown = 0; countdown < 10; countdown++) { }";
+            var expectedOutput =
+@"from {local countdown is 0.} until countdown = 10 step {set countdown to countdown + 1.} do { }";
+            TestOutput(source, expectedOutput);
+        }
+
         private void TestOutput(string input, string expectedOutput)
         {
             var script = CSharpScript.Create(input);
