@@ -1,5 +1,6 @@
 ﻿using KerbalAnalysis.Nodes.Abstract;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace KerbalAnalysis.Tools
 {

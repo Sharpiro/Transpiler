@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Linq;
 
 namespace KerbalAnalysis.Tests
@@ -42,14 +41,6 @@ namespace KerbalAnalysis.Tests
 @"countdown = countdown + 1";
             TestNodes(source);
         }
-
-//        [TestMethod]
-//        public void ForStatementTest()
-//        {
-//            var source =
-//@"for (int i = 0; i < 10; i++) { }";
-//            TestNodes(source);
-//        }
 
         private void TestNodes(string source)
         {

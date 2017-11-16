@@ -2,14 +2,14 @@
 using KerbalAnalysis.Nodes.Abstract;
 using System.Collections.Generic;
 using System.Text;
-using System;
 using System.Collections.Immutable;
+using KerbalAnalysis.Tools;
 
 namespace KerbalAnalysis
 {
     public class KSourceWriter
     {
-        private const string Space = " ";
+        private int _tabIndex = 0;
         private StringBuilder _builder = new StringBuilder();
 
         public string GetSourceCode(CompilationUnitNode compilation)
@@ -70,20 +70,20 @@ namespace KerbalAnalysis
         private void WritePredefinedType(PredefinedTypeNode type)
         {
             _builder.Append(type.Keyword);
-            _builder.Append(Space);
+            _builder.AppendSpace();
         }
 
         private void WriteDeclarator(VariableDeclaratorNode declarator)
         {
             _builder.Append(declarator.Identifier);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             WriteInitializer(declarator.Initializer);
         }
 
         private void WriteInitializer(EqualsValueClauseNode initializer)
         {
             _builder.Append(initializer.IsToken);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             WriteExpression(initializer.Value);
         }
 
@@ -122,34 +122,49 @@ namespace KerbalAnalysis
         private void WriteForStatement(ForStatementNode forStatementNode)
         {
             _builder.Append(forStatementNode.FromKeyword);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             WriteBlock(forStatementNode.DeclarationBlock);
-            _builder.Append(Space);
             _builder.Append(forStatementNode.UntilKeyword);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             WriteExpression(forStatementNode.Condition);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             _builder.Append(forStatementNode.StepKeyword);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             WriteBlock(forStatementNode.IncrementBlock);
-            _builder.Append(Space);
             _builder.Append(forStatementNode.DoKeyword);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             WriteStatement(forStatementNode.Statement);
         }
 
         private void WriteBlock(BlockNode declarationBlock)
         {
+            if (declarationBlock.Statements.IsEmpty)
+            {
+                _builder.Append(declarationBlock.OpenBraceToken);
+                _builder.AppendSpace();
+                _builder.Append(declarationBlock.CloseBraceToken);
+                _builder.AppendLineAndTabs(_tabIndex);
+                return;
+            }
             _builder.Append(declarationBlock.OpenBraceToken);
+            _tabIndex++;
+            _builder.AppendLineAndTabs(_tabIndex);
             WriteStatements(declarationBlock.Statements);
+            _tabIndex--;
+            _builder.AppendLineAndTabs(_tabIndex);
             _builder.Append(declarationBlock.CloseBraceToken);
+            _builder.AppendLineAndTabs(_tabIndex);
         }
 
         private void WriteStatements(ImmutableList<StatementNode> statements)
         {
+            var counter = 0;
             foreach (var statement in statements)
             {
+                if (counter != 0)
+                    _builder.AppendLineAndTabs(_tabIndex);
                 WriteStatement(statement);
+                counter++;
             }
         }
 
@@ -177,6 +192,7 @@ namespace KerbalAnalysis
                     WriteSimpleAssignmentExpression(expression as AssignmentExpressionNode);
                     break;
                 case KSyntaxKind.AddExpression:
+                case KSyntaxKind.SubtractExpression:
                 case KSyntaxKind.LessThanExpression:
                 case KSyntaxKind.LessThanOrEqualExpression:
                 case KSyntaxKind.GreaterThanExpression:
@@ -191,9 +207,9 @@ namespace KerbalAnalysis
         private void WriteBinaryExpression(BinaryExpressionNode binaryExpressionNode)
         {
             WriteExpression(binaryExpressionNode.Left);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             _builder.Append(binaryExpressionNode.OperatorToken);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             WriteExpression(binaryExpressionNode.Right);
         }
 
@@ -201,7 +217,7 @@ namespace KerbalAnalysis
         {
             _builder.Append($"{assignmentExpression.SetKeyword} ");
             WriteExpression(assignmentExpression.Left);
-            _builder.Append(Space);
+            _builder.AppendSpace();
             _builder.Append($"{assignmentExpression.ToKeyword} ");
             WriteExpression(assignmentExpression.Right);
         }

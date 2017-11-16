@@ -66,9 +66,42 @@ print("" == HELLO WORLD == "").";
         public void ForStatementTest()
         {
             var source =
-@"for (int countdown = 0; countdown < 10; countdown++) { }";
+@"for (int countdown = 10; countdown > 0; countdown--) {}";
             var expectedOutput =
-@"from {local countdown is 0.} until countdown = 10 step {set countdown to countdown + 1.} do { }";
+@"from {
+    local countdown is 10.
+}
+until countdown <= 0 step {
+    set countdown to countdown - 1.
+}
+do { }
+";
+            TestOutput(source, expectedOutput);
+        }
+
+        [TestMethod]
+        public void ForStatementBlockTest()
+        {
+            var source =
+@"for (int countdown = 10; countdown > 0; countdown--)
+{
+    print(""test"")
+    wait(1)
+    clearscreen()
+}";
+            var expectedOutput =
+@"from {
+    local countdown is 10.
+}
+until countdown <= 0 step {
+    set countdown to countdown - 1.
+}
+do {
+    print(""test"").
+    wait(1).
+    clearscreen.
+}
+";
             TestOutput(source, expectedOutput);
         }
 

@@ -40,8 +40,17 @@ namespace KerbalAnalysis
                 case KSyntaxKind.GreaterThanToken:
                     text = ">";
                     break;
+                case KSyntaxKind.LessThanEqualsToken:
+                    text = "<=";
+                    break;
+                case KSyntaxKind.GreaterThanEqualsToken:
+                    text = ">=";
+                    break;
                 case KSyntaxKind.PlusToken:
                     text = "+";
+                    break;
+                case KSyntaxKind.MinusToken:
+                    text = "-";
                     break;
                 case KSyntaxKind.SetKeyword:
                     text = "set";
@@ -206,6 +215,9 @@ namespace KerbalAnalysis
                     break;
                 case KSyntaxKind.AddExpression:
                     operatorToken = Token(KSyntaxKind.PlusToken);
+                    break;
+                case KSyntaxKind.SubtractExpression:
+                    operatorToken = Token(KSyntaxKind.MinusToken);
                     break;
                 default: throw new KeyNotFoundException($"Unable to find match for '{kind}' as a binary expression kind");
             }

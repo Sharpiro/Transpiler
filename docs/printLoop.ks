@@ -7,11 +7,17 @@ print("Counting down:")
 
 countdown = countdown + 1
 
-for (int i = 0; i < 10; i++) { }
+for (int countdown = 10; countdown > 0; countdown--) {}
 
-from {local countdown is 10.} until countdown = 0 step {set countdown to countdown - 1.} do {}
-from {local countdown is 0.} until countdown < 10 step {set countdown to countdown + 1.} do {}
+from {local countdown is 10.} until countdown <= 0 step {set countdown to countdown - 1.} do {}
+from {local countdown is 10.} until countdown <= 0 step {set countdown to countdown - 1.} do {}
 
+FROM {local countdown is 10.} UNTIL countdown = 0 STEP {SET countdown to countdown - 1.} DO {
+    PRINT "..." + countdown.
+    WAIT 1. // pauses the script here for 1 second.
+}
+
+from {local countdown is 10.} until countdown <= 0 step {set countdown to countdown - 1.} do {print("test").wait(1).}
 
 8841    GlobalStatement
 8811    ForStatement

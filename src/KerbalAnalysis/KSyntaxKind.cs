@@ -45,8 +45,10 @@
         LessThanEqualsToken = 8270,
         GreaterThanEqualsToken = 8273,
         StepKeyword = 8877,
+        MinusToken = 8202,
         PlusToken = 8203,
         AddExpression = 8668,
+        SubtractExpression = 8669,
         DoKeyword = 8330,
     }
 }

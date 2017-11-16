@@ -161,7 +161,8 @@ namespace KerbalAnalysis
         private ForStatementNode ParseForStatement(ForStatementSyntax forStatement)
         {
             var variableDeclaration = ParseDeclaration(forStatement.Declaration);
-            var condition = ParseExpression(forStatement.Condition);
+            //var condition = ParseExpression(forStatement.Condition);
+            var flippedConditon = FlipExpression(forStatement.Condition);
             var incrementExpression = ParseExpression(forStatement.Incrementors.First());
             var kForStatement =
                 KSyntaxFactory.ForStatement()
@@ -177,7 +178,7 @@ namespace KerbalAnalysis
                             .WithCloseBrace(KSyntaxFactory.Token(KSyntaxKind.CloseBraceToken))
                     )
                     .WithUntilKeyword(KSyntaxFactory.Token(KSyntaxKind.UntilKeyword))
-                    .WithCondition(condition)
+                    .WithCondition(flippedConditon)
                     .WithStepKeyword(KSyntaxFactory.Token(KSyntaxKind.StepKeyword))
                     .WithIncrementBlock(
                         KSyntaxFactory.Block()
@@ -190,6 +191,47 @@ namespace KerbalAnalysis
                     .WithDoKeyword(KSyntaxFactory.Token(KSyntaxKind.DoKeyword))
                     .WithStatement(ParseStatement(forStatement.Statement));
             return kForStatement;
+        }
+
+        private ExpressionNode FlipExpression(ExpressionSyntax expression)
+        {
+            ExpressionNode kFlippedExpression;
+            switch (expression.Kind())
+            {
+                case SyntaxKind.LessThanExpression:
+                case SyntaxKind.LessThanOrEqualExpression:
+                case SyntaxKind.GreaterThanExpression:
+                case SyntaxKind.GreaterThanOrEqualExpression:
+                    kFlippedExpression = FlipBinaryExpression(expression as BinaryExpressionSyntax);
+                    break;
+                default: throw new KeyNotFoundException($"couldn't find conditional expression to 'flip' with kind '{expression.Kind()}'");
+            }
+            return kFlippedExpression;
+        }
+
+        private ExpressionNode FlipBinaryExpression(BinaryExpressionSyntax condition)
+        {
+            BinaryExpressionNode kFlippedBinaryExpression;
+            switch (condition.Kind())
+            {
+                case SyntaxKind.LessThanExpression:
+                    kFlippedBinaryExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.GreaterThanOrEqualExpression);
+                    break;
+                case SyntaxKind.LessThanOrEqualExpression:
+                    kFlippedBinaryExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.GreaterThanExpression);
+                    break;
+                case SyntaxKind.GreaterThanExpression:
+                    kFlippedBinaryExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.LessThanOrEqualExpression);
+                    break;
+                case SyntaxKind.GreaterThanOrEqualExpression:
+                    kFlippedBinaryExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.LessThanExpression);
+                    break;
+                default: throw new KeyNotFoundException($"couldn't find conditional expression to 'flip' with kind '{condition.Kind()}'");
+            }
+            kFlippedBinaryExpression = kFlippedBinaryExpression
+                .WithLeft(ParseExpression(condition.Left))
+                .WithRight(ParseExpression(condition.Right));
+            return kFlippedBinaryExpression;
         }
 
         private ExpressionStatementNode ParseExpressionStatement(ExpressionStatementSyntax expressionStatement)
@@ -228,33 +270,37 @@ namespace KerbalAnalysis
                     break;
                 case SyntaxKind.PostIncrementExpression:
                 case SyntaxKind.PostDecrementExpression:
-                    kExpression = ParsePostIncrementExpression(expression as PostfixUnaryExpressionSyntax);
+                    kExpression = ParsePostfixUnaryExpression(expression as PostfixUnaryExpressionSyntax);
                     break;
                 default: throw new KeyNotFoundException($"couldn't find expression with kind '{expression.Kind()}'");
             }
             return kExpression;
         }
 
-        private ExpressionNode ParsePostIncrementExpression(PostfixUnaryExpressionSyntax unaryExpression)
+        private AssignmentExpressionNode ParsePostfixUnaryExpression(PostfixUnaryExpressionSyntax unaryExpression)
         {
-            ExpressionNode rightExpression;
-            var operand = ParseExpression(unaryExpression.Operand);
+            BinaryExpressionNode rightExpression;
+            var leftExpression = ParseExpression(unaryExpression.Operand);
 
             switch (unaryExpression.OperatorToken.Kind())
             {
                 case SyntaxKind.PlusPlusToken:
-                    rightExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.AddExpression)
-                        .WithLeft(operand)
-                        .WithRight(
-                            KSyntaxFactory.LiteralExpression(KSyntaxKind.NumericLiteralExpression,
-                                KSyntaxFactory.Literal(1))
-                        );
+                    rightExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.AddExpression);
+                    break;
+                case SyntaxKind.MinusMinusToken:
+                    rightExpression = KSyntaxFactory.BinaryExpression(KSyntaxKind.SubtractExpression);
                     break;
                 default: throw new KeyNotFoundException($"couldn't find unary operator with kind '{unaryExpression.Operand.Kind()}'");
             }
+            rightExpression = rightExpression
+                .WithLeft(leftExpression)
+                .WithRight(
+                    KSyntaxFactory.LiteralExpression(KSyntaxKind.NumericLiteralExpression,
+                        KSyntaxFactory.Literal(1))
+                );
             var assignmentExpression = KSyntaxFactory.AssignmentExpression(KSyntaxKind.SimpleAssignmentExpression)
                 .WithSetKeyword(KSyntaxFactory.Token(KSyntaxKind.SetKeyword))
-                .WithLeft(operand)
+                .WithLeft(leftExpression)
                 .WithToKeyword(KSyntaxFactory.Token(KSyntaxKind.ToKeyword))
                 .WithRight(rightExpression);
             return assignmentExpression;
